@@ -75,13 +75,6 @@ pip install -r requirements.txt
 
 เพิ่ม API Keys ของคุณลงในไฟล์ .env ดังนี้:
 
-code
-Env
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
 GEMINI_API_KEY="YOUR_GEMINI_API_KEY_HERE"
 UNSPLASH_ACCESS_KEY="YOUR_UNSPLASH_ACCESS_KEY_HERE"
 
@@ -89,24 +82,10 @@ UNSPLASH_ACCESS_KEY="YOUR_UNSPLASH_ACCESS_KEY_HERE"
 
 รันสคริปต์เพื่อสร้าง Vector Index จากข้อมูลหนังสือในโฟลเดอร์ data/
 
-code
-Bash
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
 python เตรียมไฟล์.py
 
 6. รันแอปพลิเคชัน:
 
-code
-Bash
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
 uvicorn main:app --reload
 
 เปิดเว็บเบราว์เซอร์แล้วไปที่ http://127.0.0.1:8000
@@ -121,23 +100,10 @@ Flow 1-4 (Tool Use): หากเป็นคำสั่งเฉพาะท�
 
 Flow 5 (Super Advisor): หากไม่ใช่คำสั่งข้างต้น คำถามจะถูกส่งต่อไปยัง "สมองกลหลัก" เพื่อทำการค้นหาข้อมูลเชิงลึก (RAG) และสังเคราะห์เป็นคำตอบ
 
-code
-Code
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
 User Query -> [main.py] -> Quick Response? -> Tool? -> [super_advisor.py] -> Gemini -> Response
 
 📂 โครงสร้างโปรเจกต์ (Project Structure)
-code
-Code
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
+
 CONSULTANT_MODEL/
 ├── data/             # ข้อมูลดิบ, โปรไฟล์ผู้ใช้/AI
 ├── index/            # ฐานข้อมูล FAISS ที่สร้างขึ้น (ถูก ignore โดย .gitignore)
@@ -152,11 +118,6 @@ CONSULTANT_MODEL/
 ├── quick_responses.py# คลังคำตอบสำเร็จรูป
 └── requirements.txt  # รายการแพ็คเกจที่ต้องใช้
 📄 License
-
-โปรเจกต์นี้อยู่ภายใต้ลิขสิทธิ์ของ MIT License - ดูรายละเอียดเพิ่มเติมได้ที่ไฟล์ LICENSE.
-
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
 
 #### **ขั้นตอนที่ 3: บันทึกและอัปโหลดขึ้น GitHub**
 
