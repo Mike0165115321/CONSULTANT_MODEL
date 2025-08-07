@@ -1,0 +1,116 @@
+📘 พิมพ์เขียวโปรเจกต์ (Project Blueprint)  
+Last Updated: 2025-07-15  
+
+🧠 สรุปสถาปัตยกรรม  
+โมเดลที่ปรึกษาส่วนบุคคล (Personal Consultant Model)  
+- "สมองกลหลัก" เพียงหนึ่งเดียว (Super-Advisor)  
+- เน้นการให้คำปรึกษาเชิงลึกจากฐานความรู้ (หนังสือ)  
+- มีเครื่องมือสนับสนุนและสามารถทำงานตามคำสั่งได้อย่างชัดเจน  
+
+────────────────────────────────────────────  
+I. โครงสร้างโฟลเดอร์ (Folder Structure)  
+CONSULTANT_MODEL/  
+│  
+├── data/                     ← ข้อมูลดิบ, ตัวตน, ความจำระยะสั้น  
+│   ├── *.jsonl  
+│   ├── user_profile.json  
+│   ├── feng_profile.json  
+│   └── memory.db            ← SQLite (short-term memory)  
+│  
+├── index/                    ← ฐานข้อมูลความรู้จากหนังสือ  
+│   ├── faiss.index  
+│   └── mapping.json  
+│  
+├── modules/                  ← "สมอง" + เครื่องมือเสริม  
+│   ├── image_search.py      ← ค้นหารูปภาพ  
+│   ├── reporter.py          ← รายงานวัน/เวลา  
+│   ├── system_tools.py      ← ควบคุม OS  
+│   └── super_advisor.py     ← สมองกลหลัก  
+│  
+├── web/                      ← ส่วนหน้าเว็บไซต์  
+│   ├── index.html  
+│   └── static/  
+│       ├── script.js  
+│       └── styles.css  
+│  
+├── .env                      ← API keys และข้อมูลลับ  
+├── .gitignore  
+│  
+├── ai_bot.py                 ← ห้องเครื่อง: โหลดทรัพยากร  
+├── main.py                   ← ผู้จัดการ Flow หลัก  
+├── quick_responses.py        ← คลังข้อความตอบกลับสำเร็จรูป  
+│
+├── 🛠️ (เครื่องมือจัดการข้อมูล)
+│   ├── เตรียมไฟล์.py              โรงงาน: สร้าง faiss.index และ mapping.json
+│   ├── add_category_tool.py     เครื่องมือช่วย: เพิ่ม Category ให้ไฟล์ .jsonl
+│   └── เพิ่มข้อมูลหนังสือ.py       เครื่องมือช่วย: เพิ่มข้อมูลหนังสือเล่มใหม่
+│
+└── code.txt                  ← เอกสารพิมพ์เขียว (ฉบับนี้)  
+
+────────────────────────────────────────────  
+II. หน้าที่ของไฟล์และฟังก์ชันหลัก (File & Function Directory)  
+
+📌 Backend: The Core Brain  
+▶ main.py ← ผู้จัดการ (Central Dispatcher)  
+หน้าที่: Web Server (FastAPI), ควบคุมการไหลของงาน  
+ฟังก์ชันหลัก:  
+- startup_event(): เตรียมฐานความจำ  
+- ask_question(query): ควบคุม Flow การทำงาน  
+    1. รับ query  
+    2. บันทึกลง memory.db  
+    3. ตรวจสอบคำสั่งพื้นฐาน  
+       - Flow 0/0.5: ตอบกลับด่วนจาก quick_responses  
+       - Flow 1: เรียก reporter.py  
+       - Flow 2: เรียก system_tools.py  
+       - Flow 3: เรียก image_search.py  
+    4. หากไม่พบคำสั่ง → ส่งต่อ super_advisor.py  
+    5. สร้าง ChatResponse ส่งกลับ  
+
+▶ ai_bot.py ← ห้องเครื่อง (Engine Room)  
+หน้าที่: โหลดโมเดล, เชื่อม API, จัดการความจำ  
+ฟังก์ชันหลัก:  
+- โหลดโมเดล AI, FAISS Index, Gemini API  
+- create_persona_block(): สร้างตัวตนจาก feng_profile.json  
+- get_daily_context(): สร้างบริบทประจำวันที่อิงเวลา  
+- init/add/get_short_term_memory(): จัดการ memory.db  
+- analyze_sentiment(): วิเคราะห์อารมณ์  
+- clean_response(): เคลียร์ข้อความก่อนแสดง  
+
+▶ super_advisor.py ← สมองกลหลัก (The Core Brain)  
+หน้าที่: ตอบคำถามเชิงลึก + ให้คำปรึกษา  
+ฟังก์ชันหลัก:  
+- handle_super_advisor_query():  
+    - รับข้อมูลจาก main.py  
+    - ตอบคำถามพื้นฐาน (เกี่ยวกับหนังสือ)  
+    - ใช้ RAG ค้นความรู้  
+    - สังเคราะห์คำตอบโดยใช้ Master Prompt  
+
+▶ modules อื่นๆ  
+- reporter.py: handle_reporter_query() → บอกวัน/เวลา  
+- system_tools.py: handle_system_tool_query() → ควบคุม OS  
+- image_search.py: search_for_image() → เชื่อม Unsplash API  
+
+────────────────────────────────────────────  
+🎨 Frontend: The Face & Voice  
+▶ web/static/script.js ← ระบบประสาทส่วนหน้า  
+หน้าที่: ควบคุมการโต้ตอบผู้ใช้ทั้งหมด  
+
+State Management:  
+- chatHistory → เก็บข้อความสนทนา  
+- isFengThinking → ควบคุม UI ขณะ AI คิด  
+- isSoundEnabled, isAudioUnlocked → จัดการเสียง  
+
+Core Functions:  
+- handleUserSubmit(): ส่งข้อความผู้ใช้ไป Backend  
+- addMessageToLog(): แสดงข้อความ + รูปภาพ  
+- getFengResponseFromAPI(): ติดต่อ Endpoint /ask  
+
+Speech-to-Text (STT):  
+- ใช้ window.SpeechRecognition  
+
+Text-to-Speech (TTS):  
+- ใช้ window.speechSynthesis เพื่ออ่านออกเสียง  
+
+────────────────────────────────────────────  
+📌 หมายเหตุ:  
+ไฟล์นี้คือพิมพ์เขียวฉบับย่อ ใช้อ้างอิงโครงสร้างโปรเจกต์และหน้าที่ระบบ  
